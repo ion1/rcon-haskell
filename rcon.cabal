@@ -1,0 +1,44 @@
+name:                rcon
+version:             0.0.0.1
+synopsis:            Implementation of the rcon protocol
+-- description:
+homepage:            https://github.com/ion1/rcon-haskell
+license:             ISC
+license-file:        COPYING
+author:              Johan Kiviniemi
+maintainer:          devel@johan.kiviniemi.name
+-- copyright:
+category:            Network
+build-type:          Simple
+cabal-version:       >= 1.8
+
+library
+  exposed-modules:     Network.Rcon
+  -- other-modules:
+  build-depends:       attoparsec == 0.10.*,
+                       base == 4.*,
+                       bytestring == 0.9.*,
+                       cereal == 0.3.*,
+                       network == 2.3.*
+  ghc-options:         -Werror -Wall
+  cc-options:          -Werror -Wall -Wextra
+
+test-suite test-rcon
+  type:                exitcode-stdio-1.0
+  main-is:             RunTests.hs
+  build-depends:       attoparsec == 0.10.*,
+                       base == 4.*,
+                       bytestring == 0.9.*,
+                       cereal == 0.3.*,
+                       network == 2.3.*,
+                       QuickCheck == 2.4.*,
+                       test-framework == 0.6.*,
+                       test-framework-quickcheck2 == 0.2.*
+  ghc-options:         -Werror -Wall
+  cc-options:          -Werror -Wall -Wextra
+
+source-repository head
+  type:                git
+  location:            git://github.com/ion1/rcon-haskell.git
+
+-- vim:set et sw=2 sts=2:
