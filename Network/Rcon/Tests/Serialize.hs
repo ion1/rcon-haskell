@@ -25,6 +25,7 @@ import           Network.Rcon.Serialize
 import           Control.Applicative
 import qualified Data.ByteString                      as BS
 import           Data.Serialize
+import           Data.Word
 import           Test.Framework                       (Test, testGroup)
 import           Test.Framework.Providers.QuickCheck2 (testProperty)
 import           Test.QuickCheck
@@ -33,13 +34,43 @@ tests :: Test
 tests = testGroup "Network.Rcon.Tests.Serialize"
                   [ testProperty "encodeDecodeQ" prop_encodeDecodeQ
                   , testProperty "encodeDecodeR" prop_encodeDecodeR
+                  , testProperty "shortQ" prop_shortQ
+                  , testProperty "shortR" prop_shortR
+                  , testProperty "longQ" prop_longQ
+                  , testProperty "longR" prop_longR
                   ]
+
+-- decode . encode ≡ id
 
 prop_encodeDecodeQ :: QueryPacket -> Bool
 prop_encodeDecodeQ packet = decode (encode packet) == Right packet
 
 prop_encodeDecodeR :: ResponsePacket -> Bool
 prop_encodeDecodeR packet = decode (encode packet) == Right packet
+
+-- Removing the last byte results in parse failure.
+
+prop_shortQ :: QueryPacket -> Bool
+prop_shortQ packet =
+  isLeft $ decode (BS.init (encode packet)) `asTypeOf` Right packet
+
+prop_shortR :: ResponsePacket -> Bool
+prop_shortR packet =
+  isLeft $ decode (BS.init (encode packet)) `asTypeOf` Right packet
+
+-- Adding an extra byte results in parse failure.
+
+prop_longQ :: QueryPacket -> Word8 -> Bool
+prop_longQ packet extra =
+  isLeft $ decode (encode packet `BS.snoc` extra) `asTypeOf` Right packet
+
+prop_longR :: ResponsePacket -> Word8 -> Bool
+prop_longR packet extra =
+  isLeft $ decode (encode packet `BS.snoc` extra) `asTypeOf` Right packet
+
+isLeft :: Either a b -> Bool
+isLeft (Left _) = True
+isLeft _        = False
 
 instance Arbitrary QueryPacket where
   arbitrary = oneof [ AuthQ        <$> arbitrary <*> nonNullBS
