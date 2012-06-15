@@ -40,7 +40,7 @@ tests = testGroup "Network.Rcon.Tests.Serialize"
                   , testProperty "longR" prop_longR
                   ]
 
--- decode . encode ≡ id
+-- decode . encode ≡ Right
 
 prop_encodeDecodeQ :: QueryPacket -> Bool
 prop_encodeDecodeQ packet = decode (encode packet) == Right packet
