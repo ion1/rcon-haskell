@@ -57,9 +57,9 @@ data ClientException = LookupFailed     String
   deriving (Show, Typeable)
 instance Exc.Exception ClientException
 
-connect :: String -> Integer -> BS.ByteString -> IO ClientHandle
+connect :: String -> String -> BS.ByteString -> IO ClientHandle
 connect host port password =
-  do addrs <- So.getAddrInfo (Just hints) (Just host) (Just (show port))
+  do addrs <- So.getAddrInfo (Just hints) (Just host) (Just port)
      addr  <- (maybe lookupFailed return . listToMaybe) addrs
      sock  <- So.socket (So.addrFamily addr)
                         (So.addrSocketType addr)
