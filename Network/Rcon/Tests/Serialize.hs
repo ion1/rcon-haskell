@@ -54,16 +54,17 @@ prop_encodeDecode packet = (decode . encode) packet == Right packet
 -- Removing the last byte results in parse failure.
 
 prop_short :: Serialize a => a -> Bool
-prop_short packet =
-  isLeft $ (decode . corrupt . encode) packet `asTypeOf` Right packet
-  where corrupt = BS.init
+prop_short = corrupt_prop BS.init
 
 -- Adding an extra byte results in parse failure.
 
 prop_long :: Serialize a => a -> Word8 -> Bool
-prop_long packet extra =
+prop_long packet extra = corrupt_prop (`BS.snoc` extra) packet
+
+corrupt_prop :: Serialize a
+             => (BS.ByteString -> BS.ByteString) -> a -> Bool
+corrupt_prop corrupt packet =
   isLeft $ (decode . corrupt . encode) packet `asTypeOf` Right packet
-  where corrupt s = s `BS.snoc` extra
 
 isLeft :: Either a b -> Bool
 isLeft (Left _) = True
