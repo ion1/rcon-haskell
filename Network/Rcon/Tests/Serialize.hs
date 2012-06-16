@@ -32,32 +32,26 @@ import           Test.QuickCheck
 
 tests :: Test
 tests = testGroup "Network.Rcon.Tests.Serialize"
-                  [ testProperty "encodeDecodeQ" prop_encodeDecodeQ
-                  , testProperty "encodeDecodeR" prop_encodeDecodeR
-                  , testProperty "shortQ" prop_shortQ
-                  , testProperty "shortR" prop_shortR
-                  , testProperty "longQ" prop_longQ
-                  , testProperty "longR" prop_longR
+                  [ testProperty "encodeDecodeQ" (againstQ prop_encodeDecode)
+                  , testProperty "encodeDecodeR" (againstR prop_encodeDecode)
+                  , testProperty "shortQ" (againstQ prop_short)
+                  , testProperty "shortR" (againstR prop_short)
+                  , testProperty "longQ" (againstQ prop_long)
+                  , testProperty "longR" (againstR prop_long)
                   ]
 
+againstQ :: Testable a => (QueryPacket -> a) -> (QueryPacket -> a)
+againstQ = id
+
+againstR :: Testable a => (ResponsePacket -> a) -> (ResponsePacket -> a)
+againstR = id
+
 -- decode . encode ≡ Right
-
-prop_encodeDecodeQ :: QueryPacket -> Bool
-prop_encodeDecodeQ = prop_encodeDecode
-
-prop_encodeDecodeR :: ResponsePacket -> Bool
-prop_encodeDecodeR = prop_encodeDecode
 
 prop_encodeDecode :: (Serialize a, Eq a) => a -> Bool
 prop_encodeDecode packet = (decode . encode) packet == Right packet
 
 -- Removing the last byte results in parse failure.
-
-prop_shortQ :: QueryPacket -> Bool
-prop_shortQ = prop_short
-
-prop_shortR :: ResponsePacket -> Bool
-prop_shortR = prop_short
 
 prop_short :: Serialize a => a -> Bool
 prop_short packet =
@@ -65,12 +59,6 @@ prop_short packet =
   where corrupt = BS.init
 
 -- Adding an extra byte results in parse failure.
-
-prop_longQ :: QueryPacket -> Word8 -> Bool
-prop_longQ = prop_long
-
-prop_longR :: ResponsePacket -> Word8 -> Bool
-prop_longR = prop_long
 
 prop_long :: Serialize a => a -> Word8 -> Bool
 prop_long packet extra =
