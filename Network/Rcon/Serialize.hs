@@ -50,7 +50,7 @@ putQOrR id_ type_ bs =
 
 -- Put a null-terminated bytestring.
 putByteString0 :: BS.ByteString -> Put
-putByteString0 bs = putByteString bs >> putWord8 0
+putByteString0 bs = putByteString (BS.takeWhile (/= 0) bs) >> putWord8 0
 
 getAll :: Get BS.ByteString
 getAll = getBytes =<< remaining
