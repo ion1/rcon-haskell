@@ -43,29 +43,36 @@ tests = testGroup "Network.Rcon.Tests.Serialize"
 -- decode . encode ≡ Right
 
 prop_encodeDecodeQ :: QueryPacket -> Bool
-prop_encodeDecodeQ packet = decode (encode packet) == Right packet
+prop_encodeDecodeQ = prop_encodeDecode
 
 prop_encodeDecodeR :: ResponsePacket -> Bool
-prop_encodeDecodeR packet = decode (encode packet) == Right packet
+prop_encodeDecodeR = prop_encodeDecode
+
+prop_encodeDecode :: (Serialize a, Eq a) => a -> Bool
+prop_encodeDecode packet = decode (encode packet) == Right packet
 
 -- Removing the last byte results in parse failure.
 
 prop_shortQ :: QueryPacket -> Bool
-prop_shortQ packet =
-  isLeft $ decode (BS.init (encode packet)) `asTypeOf` Right packet
+prop_shortQ = prop_short
 
 prop_shortR :: ResponsePacket -> Bool
-prop_shortR packet =
+prop_shortR = prop_short
+
+prop_short :: Serialize a => a -> Bool
+prop_short packet =
   isLeft $ decode (BS.init (encode packet)) `asTypeOf` Right packet
 
 -- Adding an extra byte results in parse failure.
 
 prop_longQ :: QueryPacket -> Word8 -> Bool
-prop_longQ packet extra =
-  isLeft $ decode (encode packet `BS.snoc` extra) `asTypeOf` Right packet
+prop_longQ = prop_long
 
 prop_longR :: ResponsePacket -> Word8 -> Bool
-prop_longR packet extra =
+prop_longR = prop_long
+
+prop_long :: Serialize a => a -> Word8 -> Bool
+prop_long packet extra =
   isLeft $ decode (encode packet `BS.snoc` extra) `asTypeOf` Right packet
 
 isLeft :: Either a b -> Bool
