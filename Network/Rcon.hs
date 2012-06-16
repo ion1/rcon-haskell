@@ -14,11 +14,8 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 -}
 
-module Network.Rcon
-( QueryPacket (..)
-, ResponsePacket (..)
-) where
+module Network.Rcon (module Network.Rcon.Client) where
 
-import           Network.Rcon.Serialize
+import Network.Rcon.Client
 
 -- vim:set et sw=2 sts=2:
